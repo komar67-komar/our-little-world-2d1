@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#203a45">
+  <title>Our Little World — наш маленький мир</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <button class="brand" data-menu="main" aria-label="Главное меню"><span class="brand-mark">✦</span><span><strong>OUR LITTLE WORLD</strong><small>наш маленький мир</small></span></button>
+      <div class="top-stats"><span id="dayLabel">День 1 · Утро</span><span id="moneyLabel">◈ 120</span><button id="pauseBtn" class="icon-btn" title="Пауза" aria-label="Пауза">Ⅱ</button></div>
+    </header>
+    <section class="game-wrap" aria-label="Игровой мир">
+      <canvas id="game" width="960" height="540" aria-label="Игровая сцена"></canvas>
+      <div class="scene-title" id="sceneTitle">Наш дом · Гостиная</div>
+      <div class="toast" id="toast" aria-live="polite"></div>
+      <section class="hud-card" aria-label="Герои, отношения и потребности"><div class="pair-title"><span id="heroOneName">Лея</span><span class="heart">♥</span><span id="heroTwoName">Миша</span></div><div class="relationship"><span>Близость</span><div class="meter"><i id="relationshipFill"></i></div><b id="relationshipValue">25</b></div><div id="needs" class="needs"></div></section>
+      <div class="scene-nav" id="sceneNav" aria-label="Быстрый переход по локациям"></div>
+      <div class="mobile-controls" aria-label="Управление"><button data-key="ArrowLeft" aria-label="Двигаться влево">◀</button><button data-key="ArrowRight" aria-label="Двигаться вправо">▶</button><button data-action="jump" aria-label="Прыгнуть">▲</button><button data-action="interact" aria-label="Взаимодействовать">E</button><button data-action="switch" aria-label="Сменить героя">↔</button></div>
+      <div class="hint" id="hint">A / D — двигаться · E — взаимодействовать · Tab — сменить героя</div>
+    </section>
+    <footer class="toolbar"><button data-menu="inventory">🎒 <span>Рюкзак</span></button><button data-menu="romance">♥ <span>Вдвоём</span></button><button data-menu="wardrobe">♧ <span>Гардероб</span></button><button data-menu="map">⌖ <span>Места</span></button><button data-menu="shop">✿ <span>Магазин</span></button><button data-menu="decorate">⌂ <span>Дом</span></button><button data-menu="settings">⚙ <span>Настройки</span></button></footer>
+  </main>
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="panel"><button id="closeModal" class="close" aria-label="Закрыть меню">×</button><div id="modalContent"></div></div></div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
