@@ -26,7 +26,7 @@ function paintFrame(c, p, state, frame) {
   const hair = p.hair || '#63483c', hairHi = shade(hair, 28), hairShadow = shade(hair, -24);
   const shirt = p.shirt || '#d77d72', shirtHi = shade(shirt, 27), shirtShadow = shade(shirt, -34);
   const pants = p.pants || '#596f84', pantsHi = shade(pants, 22), pantsShadow = shade(pants, -30);
-  const outline = '#3e3a3b', shoe = '#59453e';
+  const outline = '#493b35', shoe = '#5a4438';
   const cycle = [[-1, 1, 1, -1], [0, 0, 0, 0], [1, -1, -1, 1], [0, 0, 0, 0]][frame % 4];
   const walking = state === 'walk' || state === 'handhold_walk';
   const stride = walking ? cycle : [0, 0, 0, 0];
@@ -146,6 +146,11 @@ function paintFrame(c, p, state, frame) {
   }
   px(c, 14, 13 + bob, 2, 1, skinShade); px(c, 12, 15 + bob, 4, 1, '#a65f5a');
   px(c, 9, 13 + bob, 2, 1, '#d88978'); px(c, 17, 13 + bob, 1, 1, '#d88978');
+  // Warm cloth highlights echo the honey-colored wood outlines in the new rooms.
+  if (!jump && state !== 'sit') {
+    px(c, 7, 21 + bob, 1, 4, shirtHi); px(c, 18, 22 + bob, 1, 4, shirtShadow);
+    px(c, 9, 28 + bob, 2, 1, shirtHi); px(c, 15, 28 + bob, 2, 1, shirtShadow);
+  }
 }
 
 export function getCharacterSheet(person) {
@@ -175,4 +180,5 @@ export function spriteSource(person, stateName, elapsed) {
   const frame = Math.floor(elapsed * state.fps) % state.frames;
   return { image: sheet.image, sx: frame * SPRITE.width, sy: state.row * SPRITE.height, sw: SPRITE.width, sh: SPRITE.height };
 }
+
 
