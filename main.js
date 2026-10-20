@@ -165,7 +165,7 @@ function drawCharacter(p,index,t){
  ctx.font='800 10px Nunito,system-ui';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#40564b';ctx.strokeText(p.name,x,g-SPRITE.height*SPRITE.scale-jump-7);ctx.fillStyle='#fff8e8';ctx.fillText(p.name,x,g-SPRITE.height*SPRITE.scale-jump-7);
 }
 function drawSleeper(p,index,t){
- const bed=game.houseItems.find(o=>o.id==='bed'&&o.room===game.scene);if(!bed||!p.sleepState)return;
+ const bed=game.houseItems.find(o=>o.id==='bed'&&o.room===game.scene);if(!bed||!['settling','sleeping','waking'].includes(p.sleepState))return;
  const pose=p.sleepState==='settling'?1-clamp((p.sleepTimer||0)/.62,0,1):p.sleepState==='waking'?1-clamp((p.sleepTimer||0)/.85,0,1):1;
  const x=bed.x-game.camera+(index===0?-28:28),y=scenes[game.scene].ground-39+Math.round((1-pose)*10),breath=Math.sin(t/480+index*1.7)*1.2;
  ctx.fillStyle='rgba(255,211,135,.16)';ctx.beginPath();ctx.ellipse(x,y+9,28,18,0,0,Math.PI*2);ctx.fill();
