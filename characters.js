@@ -4,7 +4,7 @@
 export const SPRITE = Object.freeze({ width: 24, height: 44, scale: 2, columns: 4 });
 
 const sheets = new Map();
-const states = Object.freeze({ idle: { row: 0, frames: 2, fps: 2.1 }, walk: { row: 1, frames: 4, fps: 9 }, jump: { row: 2, frames: 1, fps: 1 }, talk:{row:3,frames:2,fps:2}, hug:{row:4,frames:2,fps:2.4}, handhold:{row:5,frames:2,fps:2.4}, kiss:{row:6,frames:2,fps:2.2}, sit:{row:7,frames:2,fps:1.8}, handhold_walk:{row:8,frames:4,fps:9} });
+const states = Object.freeze({ idle: { row: 0, frames: 2, fps: 2.1 }, walk: { row: 1, frames: 4, fps: 9 }, jump: { row: 2, frames: 1, fps: 1 }, talk:{row:3,frames:2,fps:2}, hug:{row:4,frames:2,fps:2.4}, handhold:{row:5,frames:2,fps:2.4}, kiss:{row:6,frames:2,fps:2.2}, sit:{row:7,frames:2,fps:1.8}, handhold_walk:{row:8,frames:4,fps:9}, cast:{row:9,frames:3,fps:7}, reel:{row:10,frames:3,fps:6} });
 
 function shade(color, amount) {
   const hex = color.replace('#', '');
@@ -60,6 +60,14 @@ function paintFrame(c, p, state, frame) {
   } else if (state === 'handhold' || state === 'handhold_walk') {
     px(c, 3, 20, 4, 10, shirt); px(c, 4, 27, 5, 3, skin);
     px(c, 17, 20, 4, 10, shirt); px(c, 15, 27, 5, 3, skin);
+  } else if (state === 'cast') {
+    const draw=frame===1;
+    px(c,3,18,5,7,outline);px(c,4,17,4,7,shirt);px(c,2,draw?11:13,4,8,shirt);px(c,3,draw?9:11,3,4,skin);
+    px(c,16,18,5,10,outline);px(c,17,19,3,8,shirt);px(c,17,27,3,4,skin);
+  } else if (state === 'reel') {
+    const lift=frame===1?3:0;
+    px(c,3,17-lift,5,10,outline);px(c,4,18-lift,4,7,shirt);px(c,5,24-lift,4,4,skin);
+    px(c,16,18,5,10,outline);px(c,17,19,3,8,shirt);px(c,17,26,4,4,skin);
   } else if (state === 'talk') {
     px(c, 3, 15, 4, 8, shirt); px(c, 2, 13-(frame%2), 5, 4, skin);
     px(c, 17, 18, 4, 11, shirt); px(c, 17, 27, 3, 4, skin);
@@ -145,7 +153,7 @@ export function getCharacterSheet(person) {
   if (sheets.has(key)) return sheets.get(key);
   const image = document.createElement('canvas');
   image.width = SPRITE.width * SPRITE.columns;
-  image.height = SPRITE.height * 9;
+  image.height = SPRITE.height * 11;
   const c = image.getContext('2d', { alpha: true });
   c.imageSmoothingEnabled = false;
   for (const [stateName, config] of Object.entries(states)) {
@@ -167,3 +175,4 @@ export function spriteSource(person, stateName, elapsed) {
   const frame = Math.floor(elapsed * state.fps) % state.frames;
   return { image: sheet.image, sx: frame * SPRITE.width, sy: state.row * SPRITE.height, sw: SPRITE.width, sh: SPRITE.height };
 }
+
