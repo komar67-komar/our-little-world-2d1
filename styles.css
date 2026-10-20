@@ -69,6 +69,23 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 @media(max-width:520px){.memory-pages{grid-template-columns:1fr;max-height:220px}.letter-body{font-size:14px}}
 .hero-edit{padding:10px 13px;margin:12px 0;background:#fff3df;border:1px solid #ddc89f;border-radius:9px}.hero-edit h3{margin:2px 0 8px;color:#526852}.hero-edit .field{margin:7px 0}
 
+/* Warm, readable fishing controls and a large pixel-fish result card. */
+.panel:has(.fish-catch){width:min(560px,100%);text-align:center}
+.fish-catch{padding:3px 2px 0}
+.fish-catch canvas{display:block;width:min(100%,360px);height:auto;margin:8px auto 12px;border:3px solid #9b7955;border-radius:5px;image-rendering:pixelated;box-shadow:inset 0 0 0 3px #fff6df,0 4px 0 #d3bd95}
+.fish-catch-title{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.fish-catch-title h3{margin:4px 0;color:#475f4f;font-size:20px}
+.fish-rarity{padding:4px 9px;border-radius:20px;background:#e7eddf;color:#5a735b;font-size:11px;font-weight:900}
+.rarity-carp{background:#f2e3c4;color:#9b6a35}.rarity-bream{background:#e8e2d2;color:#6e725b}.rarity-golden{background:#ffe7a2;color:#9c641e;box-shadow:0 0 12px #ffd67d}
+.fish-stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:12px auto;color:#788277;font-size:12px}
+.fish-stats span{padding:7px 11px;background:#f2ecdc;border-radius:8px}.fish-stats b{color:#4f6656}
+.fish-hook-button{min-height:54px!important;padding:12px 28px!important;border:3px solid #fff1cc!important;border-radius:8px!important;background:#c9584c!important;box-shadow:0 4px 0 #913d39,0 0 20px #ed9e6f80!important;color:#fffbe9!important;font-size:19px!important;letter-spacing:.06em;animation:hook-pulse .6s steps(2,end) infinite alternate}
+.fish-hook-button small{display:inline-grid;place-items:center;width:23px;height:23px;margin-left:7px;border-radius:5px;background:#fff2d9;color:#8d4d3d;font-size:13px}
+.fish-bite-copy{font-weight:900;color:#a64c43!important;text-align:center}
+.fish-bite-modal .panel{border:3px solid #d5755c;box-shadow:0 0 0 4px #fff0d6,0 16px 55px #10212888}
+@keyframes hook-pulse{from{transform:translateY(1px);filter:brightness(.98)}to{transform:translateY(-2px);filter:brightness(1.12)}}
+@media(max-width:520px){.fish-catch canvas{max-height:30vh}.fish-catch-title h3{font-size:17px}.fish-hook-button{width:100%;font-size:17px!important}}
+
 /* Landscape phone play: keep the 16:9 pixel scene centered and put touch UI over it. */
 .fullscreen-btn{font:900 22px/1 system-ui,sans-serif!important;padding:0}
 .rotate-hint{display:none}
@@ -103,3 +120,4 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   .toolbar button{flex:0 0 auto;min-width:0;min-height:36px;padding:4px 5px;font-size:8px}
   .toolbar button span{display:inline;font-size:8px}
 }
+
