@@ -111,7 +111,7 @@ function drawBackdrop(scene){
    for(let i=0;i<34;i++){let x=((i*83-game.camera*.72)%1400+1400)%1400-20;flower(x,377+(i%3)*12,['#e5a18b','#f1d27b','#c99ac4','#fff0cb'][i%4])}
    for(let i=0;i<12;i++){let x=((i*131-game.camera*.64)%1400+1400)%1400-20;rect(x,338,30,12,'#658565');rect(x+8,331,22,12,'#779871');rect(x+17,336,5,3,'#a7bf79')}
   }
- } else if(type==='home'||type==='room'||type==='kitchen'){
+ } else if(type==='home'||type==='room'||type==='kitchen'||type==='bathroom'){
   // Soft-edged pixel furniture; all props remain behind the player hit area.
  if(type==='home'){
    // Framed family photo, warm wall lamp and rug. Interactive furniture is
