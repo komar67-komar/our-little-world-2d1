@@ -55,6 +55,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .panel p{font-size:14px;line-height:1.55;margin:10px 0;color:#66756a}
 .item-list{gap:7px;margin:11px 0}.item{gap:12px;padding:9px 11px;line-height:1.35}.item>div{min-width:0}.item small{font-size:11px;margin-top:3px}.item button{flex:0 0 auto;min-height:34px}
 .shop-tabs{margin:8px 0 12px}.shop-tabs button{min-width:112px}.sale-fish{gap:9px}.sale-fish-icon{flex:0 0 76px;width:76px;height:54px;image-rendering:pixelated;background:#dce9df;border:1px solid #c8d6c5;border-radius:6px}.sale-fish>div{flex:1}.sale-fish>b{white-space:nowrap;color:#8a672c}.item button:disabled{opacity:.48;cursor:not-allowed;box-shadow:none}
+.kitten-hint{position:absolute;left:16px;top:55px;z-index:2;padding:6px 10px;border:1px solid #f4e1bd;border-radius:9px;background:#fff8e9e8;color:#657650;font-size:11px;font-weight:800;pointer-events:none}.kitten-bars{display:grid;gap:8px;margin:14px 0}.kitten-meter{display:grid;grid-template-columns:88px 1fr 32px;align-items:center;gap:8px;font-size:12px;color:#66756a}.kitten-meter .meter{height:8px}.kitten-meter .meter i.fullness{background:linear-gradient(90deg,#d9b66c,#8da86f)}.kitten-meter .meter i.mood{background:linear-gradient(90deg,#df9b92,#c87988)}.kitten-meter .meter i.trust{background:linear-gradient(90deg,#91b5a1,#62927d)}.kitten-fish{gap:8px}.kitten-fish small{display:block}.kitten-fish button{flex-shrink:0}
 .actions{gap:9px}.primary,.soft{min-height:40px}.field{font-size:13px}.field input,.field select{min-height:42px}
 .toast{top:16%;max-width:min(90%,440px);width:max-content;text-align:center;line-height:1.4;padding:9px 13px;z-index:5}
 .mobile-controls button{touch-action:none;user-select:none;-webkit-user-select:none}
@@ -121,4 +122,3 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   .toolbar button{flex:0 0 auto;min-width:0;min-height:36px;padding:4px 5px;font-size:8px}
   .toolbar button span{display:inline;font-size:8px}
 }
-
