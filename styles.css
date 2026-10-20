@@ -121,3 +121,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   .toolbar button span{display:inline;font-size:8px}
 }
 
+
+/* Local pixel-art atlas icons used by inventory, furniture and shop menus. */
+.atlas-icon{display:inline-block;width:34px;height:34px;vertical-align:middle;flex:0 0 34px;background-repeat:no-repeat;background-size:400% 400%;background-position:calc(var(--icon-col)*33.333333%) calc(var(--icon-row)*33.333333%);image-rendering:pixelated}
+.atlas-icon-items{background-image:url("./assets/pixel/items-atlas.png")}
+.atlas-icon-furniture{background-image:url("./assets/pixel/interior-atlas.png")}
+.fallback-icon{display:inline-block;min-width:30px;text-align:center;font-size:22px;vertical-align:middle}
