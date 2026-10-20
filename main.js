@@ -15,6 +15,17 @@ function save(){try{const snapshot=JSON.parse(JSON.stringify(game));delete snaps
 function notify(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2200)}
 const colors=['#e7bd68','#83ad8a','#e58d79','#85a8bd'];
 function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)))}
+const pixelAtlases={};
+function loadPixelAtlas(name,path){
+ const image=new Image();pixelAtlases[name]={image,frames:[]};
+ image.onload=()=>{try{const scan=document.createElement('canvas');scan.width=image.naturalWidth;scan.height=image.naturalHeight;const sc=scan.getContext('2d',{willReadFrequently:true});sc.drawImage(image,0,0);const pixels=sc.getImageData(0,0,scan.width,scan.height).data,cellW=scan.width/4,cellH=scan.height/4;
+  for(let id=0;id<16;id++){const col=id%4,row=Math.floor(id/4),x0=Math.floor(col*cellW),x1=Math.ceil((col+1)*cellW),y0=Math.floor(row*cellH),y1=Math.ceil((row+1)*cellH);let minX=x1,minY=y1,maxX=x0-1,maxY=y0-1;for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++)if(pixels[(y*scan.width+x)*4+3]>24){if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y}pixelAtlases[name].frames[id]=maxX>=minX?{x:Math.max(x0,minX-2),y:Math.max(y0,minY-2),w:Math.min(x1,maxX+3)-Math.max(x0,minX-2),h:Math.min(y1,maxY+3)-Math.max(y0,minY-2)}:{x:x0,y:y0,w:x1-x0,h:y1-y0}}
+ }catch(error){console.warn('Could not scan pixel atlas',name,error);const w=image.naturalWidth/4,h=image.naturalHeight/4;pixelAtlases[name].frames=Array.from({length:16},(_,id)=>({x:id%4*w,y:Math.floor(id/4)*h,w,h}))}};
+ image.onerror=()=>console.warn('Pixel atlas failed to load:',path);image.src=new URL(path,import.meta.url).href
+}
+loadPixelAtlas('interior','./assets/pixel/interior-atlas.png');loadPixelAtlas('outdoor','./assets/pixel/outdoor-atlas.png');
+function drawAtlasSprite(name,id,cx,bottom,w,h,alpha=1){const atlas=pixelAtlases[name],frame=atlas?.frames[id];if(!atlas?.image.complete||!frame)return false;ctx.save();ctx.globalAlpha*=alpha;ctx.imageSmoothingEnabled=false;ctx.drawImage(atlas.image,frame.x,frame.y,frame.w,frame.h,Math.round(cx-w/2),Math.round(bottom-h),Math.round(w),Math.round(h));ctx.restore();return true}
+
 // All scenery is drawn on the original 960×540 pixel grid. Deterministic details
 // keep the scene stable while the two lightweight parallax layers move with camera.
 function drawCloud(x,y,s=1){rect(x+12*s,y,44*s,13*s,'#fff6dfb8');rect(x,y+8*s,70*s,15*s,'#fff6dfb8');rect(x+20*s,y-5*s,28*s,13*s,'#fffaf0c9')}
@@ -43,15 +54,15 @@ function drawSky(scene,t){
  }
  if(night>.02){ctx.fillStyle=`rgba(24,38,64,${(night*.11).toFixed(3)})`;ctx.fillRect(0,0,960,450)}
 }
-function tree(x,y,scale=1){
+function tree(x,y,scale=1){if(drawAtlasSprite('outdoor',0,x,y+39*scale,104*scale,132*scale))return;
  const q=(dx,dy,w,h,c)=>rect(x+dx*scale,y+dy*scale,w*scale,h*scale,c);
  q(-5,0,11,39,'#624b3e');q(-9,8,19,4,'#795c43');q(-2,13,5,16,'#745440');
  [[-31,-30,34,27,'#557a61'],[-14,-48,34,29,'#668d68'],[5,-37,34,30,'#6f986d'],[-22,-13,34,27,'#52775c'],[5,-11,34,27,'#5b835f'],[-8,-29,35,30,'#78a071']].forEach(a=>q(...a));
  [[-18,-39,9,5],[-3,-26,11,5],[13,-34,8,4],[-24,-18,8,4],[12,-12,10,5]].forEach(([dx,dy,w,h])=>q(dx,dy,w,h,'#a6bd7c'));
 }
 function flower(x,y,color){rect(x+4,y+5,2,8,'#688b5c');rect(x+1,y+8,4,2,'#7da16a');rect(x+5,y+8,4,2,'#7da16a');rect(x+2,y,3,3,color);rect(x+6,y,3,3,color);rect(x+4,y-2,3,3,'#fff0bd');rect(x+4,y+2,3,3,color)}
-function drawLamp(x,y,lit){rect(x+7,y,5,62,'#4c5d54');rect(x+2,y+58,16,4,'#435249');rect(x+2,y-5,15,15,'#46554d');rect(x+5,y-2,9,8,lit?'#ffe2a0':'#d5d2b2');if(lit){ctx.fillStyle='#ffe7a044';ctx.fillRect(x-11,y-9,39,27)}}
-function drawBench(x,y){rect(x,y,70,8,'#8e6448');rect(x+4,y+10,62,7,'#a77a54');rect(x+9,y+17,6,21,'#5d5144');rect(x+56,y+17,6,21,'#5d5144');rect(x-3,y+3,7,15,'#78563f');rect(x+66,y+3,7,15,'#78563f')}
+function drawLamp(x,y,lit){if(drawAtlasSprite('outdoor',9,x+9,y+62,38,92,lit?1:.72))return;rect(x+7,y,5,62,'#4c5d54');rect(x+2,y+58,16,4,'#435249');rect(x+2,y-5,15,15,'#46554d');rect(x+5,y-2,9,8,lit?'#ffe2a0':'#d5d2b2');if(lit){ctx.fillStyle='#ffe7a044';ctx.fillRect(x-11,y-9,39,27)}}
+function drawBench(x,y){if(drawAtlasSprite('outdoor',8,x+35,y+40,92,62))return;rect(x,y,70,8,'#8e6448');rect(x+4,y+10,62,7,'#a77a54');rect(x+9,y+17,6,21,'#5d5144');rect(x+56,y+17,6,21,'#5d5144');rect(x-3,y+3,7,15,'#78563f');rect(x+66,y+3,7,15,'#78563f')}
 function drawAnniversaryBackdrop(t){
  // Warm layered evening garden; world positions scroll with the playable camera.
  for(let i=0;i<9;i++){let x=((i*177-game.camera*.12)%1500+1500)%1500-80;rect(x,244-(i%3)*20,145,170,['#594d68','#62526d','#6c5a70'][i%3]);rect(x+19,215-(i%3)*20,105,30,'#594d68')}
@@ -78,9 +89,9 @@ function drawBackdrop(scene){
    for(let i=0;i<22;i++){let x=((i*67-waterTime*(.012+i%3*.004)-game.camera*.38)%1040+1040)%1040-40,y=320+(i*19)%62;rect(x,y,18+(i%4)*9,2,'#8eb6aa');rect(x+5,y+5,7+(i%3)*4,2,'#b5cdb0');if(i%3===0)rect(x+10,y+9,12,2,'#597f83')}
    for(let i=0;i<8;i++){let x=((i*139-waterTime*.028-game.camera*.38)%1050+1050)%1050-35,y=318+(i*23)%58;rect(x,y,3,2,'#d7d8a3');rect(x+5,y+3,2,2,'#e4e4b5')}
   // Near bank, reeds, a low timber dock, and a fishing sign occupy clear, fixed spots.
-  rect(0,374,960,31,'#8b9a68');rect(0,374,960,5,'#bdc287');rect(0,395,960,16,'#b39a70');rect(438,350,178,12,'#9c7957');rect(446,357,164,7,'#c39a6a');for(let i=0;i<7;i++)rect(448+i*26,350,3,16,'#725a48');rect(465,363,6,22,'#795f48');rect(585,363,6,22,'#795f48');
+  rect(0,374,960,31,'#8b9a68');rect(0,374,960,5,'#bdc287');rect(0,395,960,16,'#b39a70');if(!drawAtlasSprite('outdoor',10,527,385,184,100)){rect(438,350,178,12,'#9c7957');rect(446,357,164,7,'#c39a6a');for(let i=0;i<7;i++)rect(448+i*26,350,3,16,'#725a48');rect(465,363,6,22,'#795f48');rect(585,363,6,22,'#795f48')}
   for(let i=0;i<12;i++){let x=((i*103-game.camera*.72)%1120+1120)%1120-40;let h=15+(i*13)%24;rect(x,378-h,3,h,'#718b58');rect(x+5,382-h,3,h+4,'#83965d');rect(x+2,377-h,7,3,'#d5bd78');if(i%3===0){rect(x-5,381,9,5,'#748c68');rect(x+8,379,8,6,'#89996b')}}
-  drawBench(760-game.camera*.84,367);rect(183-game.camera*.7,322,3,53,'#665847');rect(165-game.camera*.7,321,39,26,'#617b67');rect(169-game.camera*.7,325,31,18,'#f2dfb7');rect(175-game.camera*.7,331,19,3,'#a36e56');
+  drawBench(760-game.camera*.84,367);if(!drawAtlasSprite('outdoor',12,184-game.camera*.7,376,58,72)){rect(183-game.camera*.7,322,3,53,'#665847');rect(165-game.camera*.7,321,39,26,'#617b67');rect(169-game.camera*.7,325,31,18,'#f2dfb7');rect(175-game.camera*.7,331,19,3,'#a36e56')}
   for(let i=0;i<7;i++){let x=((i*157-game.camera*.25)%1080+1080)%1080-50;tree(x,367,1.05+(i%3)*.1)}
   return
  }
@@ -121,8 +132,8 @@ function drawBackdrop(scene){
   rect(0,100,960,12,'#b37d5b');rect(85,117,790,160,'#b8d4c8');rect(94,125,370,143,'#d8e6cf');rect(477,125,388,143,'#c6d9c7');rect(470,116,8,164,'#f3e4c7');for(let i=0;i<8;i++){let x=i*120;rect(x,109,4,170,'#fff1d4')};
   // window boxes and striped canopy
   rect(62,274,835,16,'#a77455');rect(70,278,819,9,'#c39167');rect(84,285,46,21,'#77946d');rect(845,285,38,21,'#77946d');
-  rect(366,145,228,51,'#7a5b48');rect(376,151,208,39,'#e8bd70');rect(390,158,180,10,'#fff0ca');rect(406,173,148,5,'#bd815e');
-  for(let x=118;x<880;x+=245){rect(x+10,334,138,11,'#98694f');rect(x+19,345,9,40,'#674e40');rect(x+130,345,9,40,'#674e40');rect(x+23,317,33,17,'#6f8b70');rect(x+104,317,33,17,'#6f8b70');rect(x+57,320,43,12,'#ead8b7');rect(x+67,313,23,8,'#c38469');rect(x+72,309,13,5,'#f1ddaa')}
+  rect(366,145,228,51,'#7a5b48');rect(376,151,208,39,'#e8bd70');rect(390,158,180,10,'#fff0ca');rect(406,173,148,5,'#bd815e');drawAtlasSprite('outdoor',13,480,292,270,104);
+  for(let x=118;x<880;x+=245){if(!drawAtlasSprite('outdoor',14,x+79,390,150,106)){rect(x+10,334,138,11,'#98694f');rect(x+19,345,9,40,'#674e40');rect(x+130,345,9,40,'#674e40');rect(x+23,317,33,17,'#6f8b70');rect(x+104,317,33,17,'#6f8b70');rect(x+57,320,43,12,'#ead8b7');rect(x+67,313,23,8,'#c38469');rect(x+72,309,13,5,'#f1ddaa')}}
   rect(761,310,72,15,'#90684b');rect(773,325,8,31,'#684d3e');rect(814,325,8,31,'#684d3e');
  } else if(type==='shop'){
   rect(0,360,960,86,'#8e6b52');rect(107,194,746,176,'#775847');rect(113,198,734,168,'#d8b484');
@@ -130,11 +141,11 @@ function drawBackdrop(scene){
   rect(91,174,778,34,'#6e8873');for(let i=0;i<12;i++)rect(98+i*64,174,30,34,i%2?'#7e987c':'#e7d6b6');rect(350,133,260,42,'#815f4a');rect(359,140,242,28,'#ebc77f');rect(396,150,168,8,'#fff0cc');
   // bright display windows, lintels and wooden mullions
   for(let i=0;i<5;i++){let x=161+i*132;rect(x-5,229,91,122,'#775948');rect(x,234,81,112,['#e0d0af','#c6d8c3','#e7d3af'][i%3]);rect(x+7,241,67,42,'#f1e5c9');rect(x+7,288,67,51,'#ead8b7');rect(x+38,234,4,108,'#956e52');rect(x+5,279,71,5,'#926b4e');rect(x+11,315,15,14,'#df9177');rect(x+31,305,18,22,'#86a381');rect(x+55,313,13,15,'#e9c46c');rect(x+8,344,64,5,'#855e46')}
-  rect(420,213,120,14,'#8e684d');rect(421,226,8,8,'#d6b66e');rect(530,226,8,8,'#d6b66e');
+  rect(420,213,120,14,'#8e684d');rect(421,226,8,8,'#d6b66e');rect(530,226,8,8,'#d6b66e');drawAtlasSprite('outdoor',15,775,367,142,166);
  }
 }
 const furnitureDefs={sofa:{name:'Диван',icon:'▰',w:112,h:65,action:'Отдохнуть на диване'},armchair:{name:'Кресло',icon:'▰',w:62,h:58,action:'Посидеть в кресле'},coffee_table:{name:'Журнальный столик',icon:'▱',w:76,h:35,action:'Посидеть у столика'},bed:{name:'Кровать',icon:'▰',w:128,h:68,action:'Поспать'},wardrobe:{name:'Шкаф',icon:'▤',w:66,h:110,action:'Выбрать одежду'},fridge:{name:'Холодильник',icon:'▯',w:58,h:116,action:'Открыть холодильник'},stove:{name:'Плита',icon:'▤',w:76,h:65,action:'Приготовить еду'},dining_table:{name:'Обеденный стол',icon:'▱',w:94,h:58,action:'Сесть за стол'},chair:{name:'Стул',icon:'▰',w:38,h:50,action:'Посидеть'},tub:{name:'Ванна',icon:'▱',w:140,h:58,action:'Принять ванну'},sink:{name:'Раковина',icon:'▱',w:62,h:69,action:'Умыться'},toilet:{name:'Туалет',icon:'▤',w:52,h:62,action:'Использовать туалет'},plant:{name:'Комнатный цветок',icon:'♧',w:44,h:55,action:'Полить цветок'},lamp:{name:'Тёплый торшер',icon:'✧',w:38,h:100,action:'Включить торшер'},bookshelf:{name:'Книжный шкаф',icon:'▤',w:72,h:112,action:'Почитать книгу'}};
-function drawFurniture(o){const d=furnitureDefs[o.id];if(!d)return;const x=Math.round(o.x-game.camera),y=scenes[game.scene].ground;const r=(a,b,w,h,c)=>rect(x+a,y+b,w,h,c);r(-d.w/2+3,-4,d.w-6,4,'#74563f');
+function drawFurniture(o){const d=furnitureDefs[o.id];if(!d)return;const x=Math.round(o.x-game.camera),y=scenes[game.scene].ground;const atlasId={bed:0,wardrobe:1,dresser:2,sofa:3,armchair:4,coffee_table:5,plant:6,lamp:7,fridge:8,stove:9,dining_table:10,chair:11,tub:12,sink:13,toilet:14,bookshelf:15}[o.id];const display={bed:[142,94],wardrobe:[78,118],dresser:[104,92],sofa:[136,96],armchair:[80,84],coffee_table:[104,72],plant:[86,100],lamp:[48,124],fridge:[78,118],stove:[92,104],dining_table:[138,100],chair:[58,92],tub:[158,100],sink:[84,104],toilet:[70,104],bookshelf:[98,132]}[o.id]||[d.w*1.2,d.h*1.15];if(atlasId!==undefined&&drawAtlasSprite('interior',atlasId,x,y,display[0],display[1]))return;const r=(a,b,w,h,c)=>rect(x+a,y+b,w,h,c);r(-d.w/2+3,-4,d.w-6,4,'#74563f');
  switch(o.id){case'sofa':r(-54,-47,108,37,'#52796f');r(-49,-61,98,19,'#739588');r(-50,-32,100,25,'#698b7e');r(-55,-32,12,28,'#855d43');r(43,-32,12,28,'#855d43');r(-42,-39,84,5,'#aac0a4');r(-37,-56,37,14,'#d9a28a');r(7,-56,36,14,'#e7cd9b');r(-48,-4,9,4,'#6c4e3a');r(39,-4,9,4,'#6c4e3a');break;
  case'armchair':r(-29,-43,58,29,'#66877a');r(-25,-54,50,17,'#81a092');r(-30,-30,9,26,'#805c43');r(21,-30,9,26,'#805c43');r(-20,-4,7,4,'#694d3c');r(13,-4,7,4,'#694d3c');break;
  case'coffee_table':r(-36,-18,72,8,'#b98a60');r(-31,-10,6,10,'#76583f');r(25,-10,6,10,'#76583f');r(-31,-25,62,6,'#d4ac79');r(-8,-32,16,7,'#ead9b8');break;
