@@ -54,6 +54,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .panel h3{font-size:14px;margin:18px 0 8px;color:#526852}
 .panel p{font-size:14px;line-height:1.55;margin:10px 0;color:#66756a}
 .item-list{gap:7px;margin:11px 0}.item{gap:12px;padding:9px 11px;line-height:1.35}.item>div{min-width:0}.item small{font-size:11px;margin-top:3px}.item button{flex:0 0 auto;min-height:34px}
+.shop-tabs{margin:8px 0 12px}.shop-tabs button{min-width:112px}.sale-fish{gap:9px}.sale-fish-icon{flex:0 0 76px;width:76px;height:42px;image-rendering:pixelated;background:#dce9df;border:1px solid #c8d6c5;border-radius:6px}.sale-fish>div{flex:1}.sale-fish>b{white-space:nowrap;color:#8a672c}.item button:disabled{opacity:.48;cursor:not-allowed;box-shadow:none}
 .actions{gap:9px}.primary,.soft{min-height:40px}.field{font-size:13px}.field input,.field select{min-height:42px}
 .toast{top:16%;max-width:min(90%,440px);width:max-content;text-align:center;line-height:1.4;padding:9px 13px;z-index:5}
 .mobile-controls button{touch-action:none;user-select:none;-webkit-user-select:none}
