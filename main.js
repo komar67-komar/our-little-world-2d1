@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 22204)
-Total output lines: 365
-
 import { SPRITE, spriteSource } from './characters.js';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
 ctx.imageSmoothingEnabled=false;
@@ -175,15 +172,15 @@ const fishKinds=[
  {id:'golden',name:'Золотая рыбка',rarity:'Легендарная',chance:4,price:75,range:[12,23],shape:[1,.9],colors:{edge:'#704733',body:'#e9a94f',light:'#ffe39a',shadow:'#c87538',fin:'#eb7957',scale:'#fff0b2'},description:'Редкая золотистая красавица. Говорят, она приносит удачу у тихой заводи.'}
 ];
 function drawPixelFish(target,x,y,size,kind='crucian',time=0,flip=false){
- const data=fishKinds.find(f=>f.id===kind)||fishKinds[0],c=data.colors,u=size/22,sy=data.shape[1],sx=data.shape[0];
+ const data=fishKinds.find(f=>f.id===kind)||fishKinds[0],c=data.colors,u=size/22,sy=data.shape[1],sx=data.shape[0],tail=Math.round(Math.sin(time*9)*.8);
  const rect=(gx,gy,gw,gh,color)=>{target.fillStyle=color;target.fillRect(Math.round(x+(flip?22-gx-gw:gx)*u*sx),Math.round(y+gy*u*sy),Math.max(1,Math.ceil(gw*u*sx)),Math.max(1,Math.ceil(gh*u*sy)))};
  target.save();
  // Forked tail, fins, and a stepped silhouette make each catch read as a fish even at small size.
- rect(1,4,3,2,c.edge);rect(0,3,2,2,c.edge);rect(0,5,2,2,c.edge);rect(2,3,3,1,c.fin);rect(2,6,3,1,c.fin);
+ rect(1,4+tail,3,2,c.edge);rect(0,3+tail,2,2,c.edge);rect(0,5+tail,2,2,c.edge);rect(2,3+tail,3,1,c.fin);rect(2,6+tail,3,1,c.fin);
  rect(6,1,8,2,c.edge);rect(5,2,12,1,c.edge);rect(4,3,15,1,c.edge);rect(3,4,17,3,c.edge);rect(4,7,15,1,c.edge);rect(6,8,11,1,c.edge);
- rect(7,2,7,1,c.fin);rect(6,3,9,1,c.body);rect(5,4,13,1,c.body);rect(4,5,14,1,c.body);rect(4,6,13,1,c.shadow);rect(6,7,10,1,c.body);
+ rect(8,0,2,1,c.edge);rect(7,1,3,1,c.edge);rect(9,1,4,1,c.fin);rect(7,2,7,1,c.fin);rect(6,3,9,1,c.body);rect(5,4,13,1,c.body);rect(4,5,14,1,c.body);rect(4,6,13,1,c.shadow);rect(6,7,10,1,c.body);
  rect(8,2,4,1,c.light);rect(6,3,8,1,c.light);rect(5,4,7,1,c.light);rect(5,5,3,1,c.light);
- rect(11,6,4,2,c.fin);rect(8,7,4,1,c.fin);rect(14,3,2,1,c.fin);
+ rect(11,6,4,2,c.fin);rect(11,7,3,2,c.edge);rect(12,8,3,1,c.fin);rect(8,7,4,1,c.fin);rect(14,3,2,1,c.fin);
  // Pixel scales and gill arc.
  [[8,4],[11,4],[14,4],[9,5],[12,5],[15,5]].forEach(([a,b],i)=>rect(a,b,1,1,i%2?c.scale:c.light));
  rect(16,4,1,2,c.shadow);rect(16,3,1,1,c.light);
@@ -216,7 +213,7 @@ function drawFishingGear(t){
    if(s.phase==='bite'){const pulse=elapsed*10;bobX+=Math.sin(pulse)*3+(s.variant%2?8:-6);bobY+=7+Math.abs(Math.sin(pulse*1.25))*10}
    if(s.phase==='setting'){bobX+=direction*elapsed*48;bobY+=10+elapsed*18}
    if(s.phase==='fighting'){bobX+=direction*(Math.sin(elapsed*7)*17+elapsed*8);bobY+=12+Math.abs(Math.sin(elapsed*9))*14}
-   if(s.phase==='landing'){bobX=x+direction*(44-elapsed*22);bobY=ground-65+elapsed*22}
+  if(s.phase==='landing'){bobX=x+direction*(44-elapsed*22);bobY=ground-65+elapsed*22}
   }
   ctx.strokeStyle=s.phase==='bite'||fight?'#fff4cf':'#eadbb4';ctx.lineWidth=fight?2:1;ctx.beginPath();ctx.moveTo(tipX,tipY+bend);ctx.quadraticCurveTo((tipX+bobX)/2,tipY+17,bobX,bobY);ctx.stroke();
   if(!['landing'].includes(s.phase)){
@@ -230,8 +227,8 @@ function drawFishingGear(t){
    ctx.globalAlpha=underwater ? .76 : s.phase==='bite' ? .28 : .14;
    drawPixelFish(ctx,fishX-26,fishY,52,s.fish?.kind||fishKinds[0].id,t/1000,Math.sin(t/170)>0);ctx.globalAlpha=1;
   }
-  if(s.phase==='bite'||fight){for(let i=0;i<5;i++){let sx=bobX+Math.sin(t/53+i*2)*12,sy=bobY+8+((t/38+i*7)%15);rect(sx,sy,2,2,i%2?'#ecf2d7':'#cde4d6')}}
-  if(s.phase==='landing')drawPixelFish(ctx,x+direction*26,ground-68,70,s.fish?.kind||fishKinds[0].id,t/1000,false);
+  if(s.phase==='bite'||fight||s.phase==='landing'){for(let i=0;i<6;i++){let sx=bobX+Math.sin(t/53+i*2)*12,sy=bobY+8+((t/38+i*7)%15);rect(sx,sy,2,2,i%2?'#ecf2d7':'#cde4d6')}}
+  if(s.phase==='landing'){const progress=clamp(elapsed/.95,0,1),fishX=x+direction*(112-82*progress),fishY=343+(ground-66-343)*progress-Math.sin(progress*Math.PI)*74;drawPixelFish(ctx,fishX-31,fishY,70,s.fish?.kind||fishKinds[0].id,t/1000,false)}
  }
  if(s.phase==='reeling')drawPixelFish(ctx,x+direction*28,ground-72,72,s.fish?.kind||fishKinds[0].id,t/1000,false);
 }
@@ -264,7 +261,42 @@ function houseInteract(){const p=game.heroes[game.active];if(!houseRooms.include
  const obj=objectAt(p.x);if(!obj){const nearest=game.houseItems.filter(o=>o.room===game.scene).sort((a,b)=>Math.abs(a.x-p.x)-Math.abs(b.x-p.x))[0];if(nearest&&Math.abs(nearest.x-p.x)<150){const d=furnitureDefs[nearest.id],side=p.x<=nearest.x?-1:1;p.approach={x:nearest.x+side*(d.w/2+10),object:nearest.id};p.facing=side===-1?1:-1;notify(`Подходим к предмету: ${d.name.toLowerCase()}…`);return true}return false}
  const d=furnitureDefs[obj.id];if(Math.abs(p.x-obj.x)>d.w/2+32){const side=p.x<obj.x?-1:1;p.approach={x:obj.x+side*(d.w/2+10),object:obj.id};p.facing=side===-1?1:-1;return true}performFurniture(obj,p);return true;
 }
-function performFurniture(o,p){const n=…2204 tokens truncated…y-.3,0,100);n.happy=clamp(n.happy-.15,0,100)});if(game.minute<2)game.day++;save();refresh()}
+function performFurniture(o,p){const n=game.needs[game.active];p.approach=null;p.action=o.id;p.actionTime=1.4;p.facing=o.x>=p.x?1:-1;const done=(msg)=>{notify(msg);save();refresh()};
+ if(o.id==='bed'){game.needs.forEach(v=>v.energy=100);game.minute=480;done('Вы сладко поспали. Энергия восстановлена!')}
+ else if(['sofa','armchair','chair','dining_table','coffee_table'].includes(o.id)){n.happy=clamp(n.happy+12,0,100);done('Вы устроились поудобнее и отдохнули.')}
+ else if(o.id==='wardrobe'){p.action=null;wardrobe()}
+ else if(o.id==='fridge'){const foods=game.inventory.filter(i=>['tea','cake','meal'].includes(i.id)&&i.count>0);if(!foods.length){done('В холодильнике пока пусто. Можно купить продукты в магазине.');return}openModal('Что взять из холодильника?',`<p>Небольшой перекус восстановит сытость.</p><div class="item-list">${foods.map(i=>`<div class="item"><div>${i.name}<small>В запасе: ${i.count}</small></div><button data-eat="${i.id}">Взять</button></div>`).join('')}</div>`)}
+ else if(o.id==='stove'){const ing=game.inventory.find(i=>i.id==='meal'&&i.count>0);if(ing){ing.count--;n.hunger=clamp(n.hunger+32,0,100);done('Вы приготовили тёплый обед!')}else{game.inventory.push({id:'meal',name:'Домашний обед',count:1,icon:'🍲',price:0});done('Готово! Домашний обед появился в рюкзаке.')}}
+ else if(o.id==='tub'){n.happy=clamp(n.happy+16,0,100);n.energy=clamp(n.energy+5,0,100);done('Тёплая ванна помогла расслабиться.')}
+ else if(o.id==='sink'){n.happy=clamp(n.happy+3,0,100);done('Вы умылись прохладной водой.')}
+ else if(o.id==='toilet'){n.happy=clamp(n.happy+2,0,100);done('Вы чувствуете себя лучше.')}
+ else if(o.id==='plant'){n.happy=clamp(n.happy+4,0,100);done('Цветок полит, а комната стала уютнее.')}
+ else if(o.id==='lamp'){done('В комнате зажёгся тёплый свет.')}
+ else {n.happy=clamp(n.happy+6,0,100);done('Вы провели время с любимой книгой.')}
+}
+function placeFurnitureAt(screenX,screenY){if(!game.placing)return;const rect=canvas.getBoundingClientRect();if(screenY<rect.top+rect.height*.67||screenY>rect.top+rect.height*.86){notify('Выберите место на свободном полу комнаты.');return}const move=typeof game.placing==='object',id=move?game.placing.id:game.placing,d=furnitureDefs[id],worldX=(screenX-rect.left)*canvas.width/rect.width+game.camera,x=Math.round(clamp(worldX,d.w/2+20,830-d.w/2)),moving=move?game.placing.item:null;if(!houseRooms.includes(game.scene)){notify('Мебель можно размещать только дома.');return}if(game.houseItems.some(o=>o!==moving&&o.room===game.scene&&Math.abs(o.x-x)<(d.w+(furnitureDefs[o.id]?.w||0))/2+12)){notify('Здесь мебель столкнётся с другой или загородит проход.');return}if(moving){moving.room=game.scene;moving.x=x}else{const inv=game.inventory.find(i=>i.id===id&&i.count>0);if(!inv){notify('Этот предмет отсутствует в рюкзаке.');game.placing=null;return}inv.count--;game.houseItems.push({id,room:game.scene,x})}game.placing=null;save();refresh();notify(`${d.name} ${moving?'перемещён':'поставлен'} и сохранён.`)}
+canvas.addEventListener('click',e=>{if(game.placing){placeFurnitureAt(e.clientX,e.clientY);return}if(!houseRooms.includes(game.scene))return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*canvas.width/r.width+game.camera,y=(e.clientY-r.top)*canvas.height/r.height,p=game.heroes[game.active];if(y<scenes[game.scene].ground-125||y>scenes[game.scene].ground+10)return;if(x>865){p.approach={x:875,object:'__door'};p.facing=1;if(game.holdingHands){const q=game.heroes[1-game.active];q.approach={x:875+(Number(game.handholdOffset)||0),pair:true};q.facing=1}return}const o=game.houseItems.filter(o=>o.room===game.scene).sort((a,b)=>Math.abs(a.x-x)-Math.abs(b.x-x))[0];if(!o||Math.abs(o.x-x)>(furnitureDefs[o.id]?.w||0)/2+42)return;const side=p.x<o.x?-1:1,d=furnitureDefs[o.id];p.facing=side<0?1:-1;if(Math.abs(p.x-o.x)<=d.w/2+32)performFurniture(o,p);else p.approach={x:o.x+side*(d.w/2+10),object:o.id}});
+function startJump(){if(game.holdingHands){notify('Чтобы прыгнуть, сначала отпустите руки.');return}const p=game.heroes[game.active],n=game.needs[game.active];if(p.jumpTime>0||n.energy<=8)return;p.jumpTime=.46;n.energy=clamp(n.energy-1,0,100);save();refresh()}
+function update(now){
+  let dt=Math.min((now-last)/16.67,2);last=now;clock+=dt;tickFishing(dt);
+ const heldMove=game.holdingHands&&!modalOpen()&&game.heroes.every(h=>!h.actionTime&&!h.approach);
+ if(heldMove){const leader=game.heroes[game.handholdLeader],follower=game.heroes[1-game.handholdLeader],offset=Number(game.handholdOffset)||0,dir=(keys.ArrowLeft||keys.KeyA?-1:0)+(keys.ArrowRight||keys.KeyD?1:0),min=25-Math.min(0,offset),max=scenes[game.scene].width-25-Math.max(0,offset),next=clamp(leader.x+dir*3.1*dt,min,max),delta=next-leader.x;leader.x=next;follower.x=next+offset;leader.vx=follower.vx=dt?delta/dt:0;if(dir){leader.facing=follower.facing=dir}}
+ for(let i=0;i<game.heroes.length;i++){
+  let p=game.heroes[i];if(!heldMove){p.vx=0;
+    if((i===game.active||p.approach?.pair)&&!modalOpen()&&!p.actionTime){if(p.approach){let delta=p.approach.x-p.x;if(Math.abs(delta)<3){p.x=p.approach.x;const target=p.approach.object&&game.houseItems.find(o=>o.id===p.approach.object&&o.room===game.scene),pairMove=p.approach.pair,object=p.approach.object;p.approach=null;if(target)performFurniture(target,p);else if(object==='__anniversary_gift')openAnniversaryGift();else if(object==='__fishing_spot')fishingMenu();else if(!pairMove&&object==='__door')go(roomExit())}else{p.vx=Math.sign(delta)*Math.min(3.1,Math.abs(delta));p.facing=Math.sign(delta)}}else if(i===game.active&&!(['casting','waiting','nibble','bite','setting','fighting','landing'].includes(fishingSession?.phase)&&game.scene==='fishing')){if(keys.ArrowLeft||keys.KeyA){p.vx=-3.1;p.facing=-1}if(keys.ArrowRight||keys.KeyD){p.vx=3.1;p.facing=1}}}
+   p.x=clamp(p.x+p.vx*dt,25,scenes[game.scene].width-25);
+  }
+  p.jumpTime=Math.max(0,(p.jumpTime||0)-dt/60);let progress=1-p.jumpTime/.46;p.jumpY=p.jumpTime>0?Math.sin(clamp(progress,0,1)*Math.PI)*34:0;
+  const gestureState=p.action?.startsWith('romance-')?({talk:'talk',compliment:'talk',joke:'talk',hug:'hug',handhold:'handhold',kiss:'kiss',sit:'sit'}[p.action.slice(8)]):null;const fishingState=game.scene==='fishing'&&i===game.active?({casting:'cast',setting:'reel',fighting:'reel',landing:'reel'}[fishingSession?.phase]):null;const heldState=game.holdingHands?(Math.abs(p.vx)>.1?'handhold_walk':'handhold'):null;const next=fishingState||heldState||gestureState|| (p.jumpTime>0?'jump':Math.abs(p.vx)>.1?'walk':'idle');
+  if(!p.anim)p.anim={state:'idle',from:'idle',time:0,fromTime:0,blend:1};
+  if(next!==p.anim.state){p.anim.from=p.anim.state;p.anim.fromTime=p.anim.time;p.anim.state=next;p.anim.time=0;p.anim.blend=0}
+  else p.anim.blend=clamp(p.anim.blend+dt/10.8,0,1);
+  p.anim.time+=dt/60;
+  if(p.actionTime>0){p.actionTime=Math.max(0,p.actionTime-dt/60);if(!p.actionTime){if(!(game.holdingHands&&p.action==='romance-handhold'))p.action=null;p.pairKind=null;p.anim.state=game.holdingHands?'handhold':'idle';p.anim.from=p.anim.state;p.anim.time=0;p.anim.blend=1}}
+ }
+if(game.pairRunning&&!game.pairRunning.started&&game.heroes.every(h=>!h.approach&&h.pairKind))finishPair();if(game.pairRunning?.started&&game.heroes.every(h=>!h.actionTime)){game.pairRunning=null;save();if(game.anniversary.finalPending){const ending=game.anniversary.finalPending==='ending';game.anniversary.finalPending=false;game.anniversary.finalDone=true;save();if(ending){closeModal();go('park');notify('Вечер окончен: поцелуй, огни и дорога домой.')}else openModal('С нашей первой годовщиной',`<p>Под звёздным небом вечер согревает объятием и огнями. Вот ваше послание.</p><div class="actions"><button class="primary" data-letter>Открыть письмо</button></div>`)}}
+ let h=game.heroes[game.active];game.camera=clamp(h.x-480,0,scenes[game.scene].width-960);game.minute=(game.minute+dt*.11)%1440;$('#dayLabel').textContent=`День ${game.day} · ${['Ночь','Утро','День','Вечер'][Math.floor((game.minute%1440)/360)]}`;
+ if(clock>600){clock=0;game.needs.forEach(n=>{n.hunger=clamp(n.hunger-.7,0,100);n.energy=clamp(n.energy-.3,0,100);n.happy=clamp(n.happy-.15,0,100)});if(game.minute<2)game.day++;save();refresh()}
  requestAnimationFrame(update)
 }
 let activeModal='';function modalOpen(){return !$('#modal').classList.contains('hidden')}
